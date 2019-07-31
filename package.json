@@ -1,0 +1,43 @@
+{
+  "name": "react-hooks-compose",
+  "version": "0.1.0",
+  "description": "Compose React Hooks",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --verbose --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/helloitsjoe/react-hooks-compose.git"
+  },
+  "keywords": [
+    "react",
+    "hooks",
+    "compose",
+    "composition",
+    "testing"
+  ],
+  "author": "Joe Boyle",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/helloitsjoe/react-hooks-compose/issues"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "./src/setupTests.js"
+    ]
+  },
+  "homepage": "https://github.com/helloitsjoe/react-hooks-compose#readme",
+  "devDependencies": {
+    "babel-react-simple": "^1.0.2",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.14.0",
+    "jest": "^24.8.0",
+    "prettier": "^1.18.2",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "webpack": "^4.38.0",
+    "webpack-cli": "^3.3.6",
+    "webpack-simple": "^1.4.0"
+  }
+}
