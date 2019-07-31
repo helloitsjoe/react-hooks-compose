@@ -32,7 +32,7 @@ test("returns component if no hooks", () => {
 
 test("throws if no component", () => {
   expect(() => composeHooks()()).toThrowErrorMatchingInlineSnapshot(
-    `"Component must be provided to composeHooks"`
+    `"Component must be provided to compose"`
   );
 });
 
