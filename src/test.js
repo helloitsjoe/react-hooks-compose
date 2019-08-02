@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import composeHooks from './index';
+import composeHooks from '../dist/main';
 
 const useCount = () => {
   const [count, setCount] = useState(0);
