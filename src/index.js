@@ -13,7 +13,7 @@ const composeHooks = hooks => Component => {
     const hooksProps = Object.entries(hooks).reduce(
       (acc, [hookKey, hookValue]) => {
         if (Array.isArray(hookValue())) {
-          acc[hookKey] = hookValue;
+          acc[hookKey] = hookValue();
           return acc;
         }
 

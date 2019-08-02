@@ -136,7 +136,7 @@ var composeHooks = function composeHooks(hooks) {
             hookValue = _ref2[1];
 
         if (Array.isArray(hookValue())) {
-          acc[hookKey] = hookValue;
+          acc[hookKey] = hookValue();
           return acc;
         }
 

@@ -89,7 +89,7 @@ test("hooks work as expected", () => {
 
 test("works with custom hook that returns array", () => {
   const Component = ({ simpleHook }) => {
-    const [count, setCount] = simpleHook();
+    const [count, setCount] = simpleHook;
     return <button onClick={() => setCount(c => c + 1)}>{count}</button>;
   };
 
