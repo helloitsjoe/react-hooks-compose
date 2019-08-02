@@ -1,3 +1,3 @@
-import composeHooks from './dist/main';
+const composeHooks = require('./dist/main');
 
-export default composeHooks;
+module.exports = composeHooks;
