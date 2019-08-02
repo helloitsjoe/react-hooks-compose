@@ -2,7 +2,7 @@
   "name": "react-hooks-compose",
   "version": "0.2.0",
   "description": "Compose React Hooks",
-  "main": "index.js",
+  "main": "dist/main.js",
   "scripts": {
     "test": "jest --coverage --testPathPattern=__tests__/index.test.js",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
