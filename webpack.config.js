@@ -9,12 +9,8 @@ const config1 = makeWebpackConfig({
     libraryTarget: 'umd',
   },
   devtool: 'source-map',
+  externals: 'react'
 });
-
-config1.externals = {
-  react: 'react',
-  'react-dom': 'reactDOM'
-};
 
 const config2 = makeWebpackConfig({
   entry: './src/render.js',
