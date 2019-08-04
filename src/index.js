@@ -12,12 +12,14 @@ const composeHooks = hooks => Component => {
   return props => {
     const hooksProps = Object.entries(hooks).reduce(
       (acc, [hookKey, hookValue]) => {
-        if (Array.isArray(hookValue())) {
-          acc[hookKey] = hookValue();
+        const hookReturnValue = hookValue();
+
+        if (Array.isArray(hookReturnValue)) {
+          acc[hookKey] = hookReturnValue;
           return acc;
         }
 
-        Object.entries(hookValue()).forEach(([key, value]) => {
+        Object.entries(hookReturnValue).forEach(([key, value]) => {
           if (acc[key]) {
             console.warn(
               `prop '${key}' exists, overriding with value: ${value}`
