@@ -12,13 +12,13 @@ npm i react-hooks-compose
 
 ## Basic Usage
 
-Composition Library for React Hooks
+React Hooks bring with them many benefits, but one of the potential drawbacks is testability of presentational components.
 
-React Hooks inverted the Container/Presenter pattern, putting the container in the presenter, and making it clunky to test presentational components.
+React Hooks invert the Container/Presenter pattern, putting the container _inside_ the presenter. This makes it clunky to test presentational components.
 
 This library aims to help separate concerns and give you a more ergonomic way to test components that use hooks.
 
-`composeHooks` passes values from hooks as props, and allows you to pass any other props as normal
+`composeHooks` passes values from hooks as props, and allows you to pass any other props as normal:
 
 ```js
 import composeHooks from 'react-hooks-compose';
@@ -40,10 +40,10 @@ const FormPresenter = ({ name, onChange, icon }) => (
 export default composeHooks({ useForm })(FormPresenter);
 ```
 
-If you compose with `useState` directly, the prop will be the `[value, setValue]` array
+If you compose with `useState` directly (i.e. the props is an array), the prop will remain an array and should be destructured before use:
 
 ```js
-const FormPresenter = ({ useName: [name, setName] }) => (
+const FormPresenter = ({ nameState: [name, setName] }) => (
   <div className="App">
     <h1>Hello, {name}!</h1>
     <input value={name} onChange={e => setName(e.target.value)} />
@@ -51,6 +51,15 @@ const FormPresenter = ({ useName: [name, setName] }) => (
 );
 
 export default composeHooks({
-  useName: () => useState('Calvin'),
+  nameState: () => useState('Calvin'),
+})(FormPresenter);
+```
+
+Compose multiple hooks:
+
+```js
+export default composeHooks({
+  useForm,
+  nameState: () => useState('Hobbes'),
 })(FormPresenter);
 ```

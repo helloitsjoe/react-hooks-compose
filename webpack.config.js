@@ -1,7 +1,5 @@
 const {makeWebpackConfig} = require('webpack-simple');
 
-// const config = makeWebpackConfig();
-
 const config = makeWebpackConfig({
   entry: './src/index.js',
   output: {
@@ -11,10 +9,7 @@ const config = makeWebpackConfig({
     libraryTarget: 'umd',
   },
   devtool: 'source-map',
+  externals: 'react'
 });
-
-config.externals = {
-  react: 'react'
-};
 
 module.exports = config;
