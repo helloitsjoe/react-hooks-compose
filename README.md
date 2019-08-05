@@ -10,15 +10,42 @@
 npm i react-hooks-compose
 ```
 
+## Why `react-hooks-compose`?
+
+`react-hooks-compose` gives us an ergonomic way to decoupble hooks from the
+components that use them.
+
+React Hooks bring with them many benefits. They encapsulate state logic and make
+it more reusable. But what if you have pure presentational components that you
+want to use with different functionality? What if you want to test your
+presentaional component in isolation?
+
+React Hooks invert the Container/Presenter pattern, putting the container
+_inside_ the presenter. This makes it hard to use the same presentational
+component with different hooks, and clunky to test presentational components by
+themselves.
+
+One option:
+
+```js
+import { useMyStuff } from './hooks';
+import { Presenter } from './presenter';
+
+const Wrapper = () => {
+  const { foo, bar } = useMyStuff();
+  return <Presenter foo={foo} bar={bar} />;
+};
+
+export default Wrapper;
+```
+
+This works fine, but you end up with an extra component just to connect the hook
+to the Presenter... there must be a better way!
+
 ## Basic Usage
 
-React Hooks bring with them many benefits, but one of the potential drawbacks is testability of presentational components.
-
-React Hooks invert the Container/Presenter pattern, putting the container _inside_ the presenter. This makes it clunky to test presentational components.
-
-This library aims to help separate concerns and give you a more ergonomic way to test components that use hooks.
-
-`composeHooks` passes values from hooks as props, and allows you to pass any other props as normal:
+`composeHooks` passes values from hooks as props, and allows you to pass any
+other props as normal:
 
 ```js
 import composeHooks from 'react-hooks-compose';
@@ -29,7 +56,7 @@ const useForm = () => {
   return { name, onChange };
 };
 
-const FormPresenter = ({ name, onChange, icon }) => (
+export const FormPresenter = ({ name, onChange, icon }) => (
   <div className="App">
     <div>{icon}</div>
     <h1>Hello, {name}!</h1>
@@ -40,7 +67,13 @@ const FormPresenter = ({ name, onChange, icon }) => (
 export default composeHooks({ useForm })(FormPresenter);
 ```
 
-If you compose with `useState` directly (i.e. the props is an array), the prop will remain an array and should be destructured before use:
+This allows you to export both a component with contained logic, and a purely
+presentational component.
+
+### Usage with `useState`
+
+If you compose with `useState` directly (i.e. the prop is an array), the prop
+will remain an array and should be destructured before use:
 
 ```js
 const FormPresenter = ({ nameState: [name, setName] }) => (
