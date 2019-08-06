@@ -12,7 +12,7 @@ npm i react-hooks-compose
 
 ## Why `react-hooks-compose`?
 
-`react-hooks-compose` gives us an ergonomic way to decoupble hooks from the
+`react-hooks-compose` gives us an ergonomic way to decouple hooks from the
 components that use them.
 
 React Hooks bring with them many benefits. They encapsulate state logic and make
@@ -27,7 +27,7 @@ themselves.
 
 One option:
 
-```js
+```jsx
 import { useMyStuff } from './hooks';
 import { Presenter } from './presenter';
 
@@ -47,7 +47,7 @@ to the Presenter... there must be a better way!
 `composeHooks` passes values from hooks as props, and allows you to pass any
 other props as normal:
 
-```js
+```jsx
 import composeHooks from 'react-hooks-compose';
 
 const useForm = () => {
@@ -75,7 +75,7 @@ presentational component.
 If you compose with `useState` directly (i.e. the prop is an array), the prop
 will remain an array and should be destructured before use:
 
-```js
+```jsx
 const FormPresenter = ({ nameState: [name, setName] }) => (
   <div className="App">
     <h1>Hello, {name}!</h1>
@@ -88,11 +88,30 @@ export default composeHooks({
 })(FormPresenter);
 ```
 
-Compose multiple hooks:
+### Compose multiple hooks:
 
 ```js
 export default composeHooks({
   useForm,
   nameState: () => useState('Hobbes'),
 })(FormPresenter);
+```
+
+### Pass in props for initial values
+
+If your hooks need access to props to set their initial values, you can pass a
+function to `composeHooks`. This function receives `props` as an argument:
+
+```jsx
+const useForm = (initialValue = '') => {
+  const [value, setValue] = useState(initialValue);
+  const onChange = e => setValue(e.target.value);
+  return { value, onChange };
+}
+
+const FormContainer = composeHooks(props => ({
+  useForm: useForm(props.initialValue)
+})(FormPresenter);
+
+<FormContainer initialValue="Susie" />
 ```

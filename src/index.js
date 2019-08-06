@@ -10,9 +10,17 @@ const composeHooks = hooks => Component => {
   }
 
   return props => {
-    const hooksProps = Object.entries(hooks).reduce(
+    // TODO: Might want to do some optimization similar to what react-redux
+    // does for mapStateToProps:
+    // https://github.com/reduxjs/react-redux/blob/master/src/connect/wrapMapToProps.js
+
+    const hooksIsFunc = typeof hooks === 'function';
+
+    const hooksObject = hooksIsFunc ? hooks(props) : hooks;
+
+    const hooksProps = Object.entries(hooksObject).reduce(
       (acc, [hookKey, hookValue]) => {
-        const hookReturnValue = hookValue();
+        const hookReturnValue = hooksIsFunc ? hookValue : hookValue();
 
         if (Array.isArray(hookReturnValue)) {
           acc[hookKey] = hookReturnValue;
