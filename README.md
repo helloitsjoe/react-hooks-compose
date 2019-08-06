@@ -100,7 +100,8 @@ export default composeHooks({
 ### Pass in props for initial values
 
 If your hooks need access to props to set their initial values, you can pass a
-function to `composeHooks`. This function receives `props` as an argument:
+function to `composeHooks`. This function receives `props` as an argument, and
+should always return an object:
 
 ```jsx
 const useForm = (initialValue = '') => {
