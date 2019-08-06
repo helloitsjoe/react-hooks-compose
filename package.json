@@ -1,6 +1,6 @@
 {
   "name": "react-hooks-compose",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "Compose React Hooks",
   "main": "dist/main.js",
   "scripts": {
