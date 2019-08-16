@@ -1,4 +1,4 @@
-const {makeWebpackConfig} = require('webpack-simple');
+const { makeWebpackConfig } = require('webpack-simple');
 
 const config = makeWebpackConfig({
   entry: './src/index.js',
@@ -8,8 +8,9 @@ const config = makeWebpackConfig({
     library: 'react-hooks-compose',
     libraryTarget: 'umd',
   },
+  mode: 'production',
   devtool: 'source-map',
-  externals: 'react'
+  externals: 'react',
 });
 
 module.exports = config;

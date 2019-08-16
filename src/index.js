@@ -10,7 +10,7 @@ const composeHooks = hooks => Component => {
   }
 
   return props => {
-    // TODO: Might want to do some optimization similar to what react-redux
+    // TODO: Potentially do some optimization similar to what react-redux
     // does for mapStateToProps:
     // https://github.com/reduxjs/react-redux/blob/master/src/connect/wrapMapToProps.js
 
