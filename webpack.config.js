@@ -1,4 +1,4 @@
-const {makeWebpackConfig} = require('webpack-simple');
+const { makeWebpackConfig } = require('webpack-simple');
 
 const config1 = makeWebpackConfig({
   entry: './src/index.js',
@@ -9,7 +9,7 @@ const config1 = makeWebpackConfig({
     libraryTarget: 'umd',
   },
   devtool: 'source-map',
-  externals: 'react'
+  externals: 'react',
 });
 
 const config2 = makeWebpackConfig({
@@ -20,7 +20,7 @@ const config2 = makeWebpackConfig({
     library: 'react-hooks-compose',
     libraryTarget: 'umd',
   },
-  devtool: 'source-map'
+  devtool: 'source-map',
 });
 
 module.exports = [config1, config2];

@@ -14,8 +14,8 @@ const useCount = () => {
   return { count, increment, decrement };
 };
 
-const useChange = () => {
-  const [value, setValue] = useState(INITIAL_VALUE);
+const useChange = (initialValue = INITIAL_VALUE) => {
+  const [value, setValue] = useState(initialValue);
   const onChange = e => setValue(e.target.value);
   return { value, onChange };
 };
@@ -89,7 +89,7 @@ test("hooks work as expected", () => {
 
 test("works with custom hook that returns array", () => {
   const Component = ({ simpleHook }) => {
-    const [count, setCount] = simpleHook();
+    const [count, setCount] = simpleHook;
     return <button onClick={() => setCount(c => c + 1)}>{count}</button>;
   };
 
@@ -98,4 +98,14 @@ test("works with custom hook that returns array", () => {
   expect(wrapper.text()).toBe(INITIAL_COUNT.toString());
   wrapper.find("button").simulate("click");
   expect(wrapper.text()).toBe((INITIAL_COUNT + 1).toString());
+});
+
+test('can pass props to hooks via function', () => {
+  const TEST_VALUE = 'test-value';
+  const Component = ({ value }) => value;
+  const Container = composeHooks(props => ({
+    useChange: useChange(props.initialValue)
+  }))(Component);
+  const wrapper = mount(<Container initialValue={TEST_VALUE} />);
+  expect(wrapper.text()).toBe(TEST_VALUE);
 });
