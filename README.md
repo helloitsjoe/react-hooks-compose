@@ -111,7 +111,7 @@ const useForm = (initialValue = '') => {
 }
 
 const FormContainer = composeHooks(props => ({
-  useForm: useForm(props.initialValue)
+  useForm: () => useForm(props.initialValue)
 })(FormPresenter);
 
 <FormContainer initialValue="Susie" />

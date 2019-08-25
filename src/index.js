@@ -10,35 +10,28 @@ const composeHooks = hooks => Component => {
   }
 
   return props => {
-    // TODO: Potentially do some optimization similar to what react-redux
-    // does for mapStateToProps:
+    // TODO: Potentially optimize similar to mapStateToProps in react-redux
     // https://github.com/reduxjs/react-redux/blob/master/src/connect/wrapMapToProps.js
 
-    const hooksIsFunc = typeof hooks === 'function';
+    const hooksObject = typeof hooks === 'function' ? hooks(props) : hooks;
 
-    const hooksObject = hooksIsFunc ? hooks(props) : hooks;
+    // Flatten values from all hooks to a single object
+    const hooksProps = Object.entries(hooksObject).reduce((acc, [hookKey, hook]) => {
+      let hookValue = hook();
 
-    const hooksProps = Object.entries(hooksObject).reduce(
-      (acc, [hookKey, hookValue]) => {
-        const hookReturnValue = hooksIsFunc ? hookValue : hookValue();
+      if (Array.isArray(hookValue) || typeof hookValue !== 'object') {
+        hookValue = { [hookKey]: hookValue };
+      }
 
-        if (Array.isArray(hookReturnValue)) {
-          acc[hookKey] = hookReturnValue;
-          return acc;
+      Object.entries(hookValue).forEach(([key, value]) => {
+        if (acc[key]) {
+          console.warn(`prop '${key}' exists, overriding with value: ${value}`);
         }
+        acc[key] = value;
+      });
 
-        Object.entries(hookReturnValue).forEach(([key, value]) => {
-          if (acc[key]) {
-            console.warn(
-              `prop '${key}' exists, overriding with value: ${value}`
-            );
-          }
-          acc[key] = value;
-        });
-        return acc;
-      },
-      {}
-    );
+      return acc;
+    }, {});
 
     return <Component {...hooksProps} {...props} />;
   };
