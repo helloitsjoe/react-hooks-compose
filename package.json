@@ -7,7 +7,8 @@
     "test": "jest --coverage --testPathPattern=__tests__/index.test.js",
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "watch": "webpack --watch",
-    "build": "webpack"
+    "build": "webpack",
+    "prepublishOnly": "npm t -- --silent"
   },
   "repository": {
     "type": "git",
