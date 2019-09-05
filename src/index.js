@@ -24,8 +24,10 @@ const composeHooks = hooks => Component => {
       }
 
       Object.entries(hookValue).forEach(([key, value]) => {
-        if (acc[key]) {
-          console.warn(`prop '${key}' exists, overriding with value: ${value}`);
+        const duplicate = acc[key] ? value : props[key];
+
+        if (typeof duplicate !== 'undefined') {
+          console.warn(`prop '${key}' exists, overriding with value: '${duplicate}'`);
         }
         acc[key] = value;
       });

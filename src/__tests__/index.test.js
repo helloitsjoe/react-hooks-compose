@@ -22,7 +22,7 @@ const useChange = (initialValue = INITIAL_VALUE) => {
 
 const useUseState = () => useState(INITIAL_COUNT);
 
-const TestComponent = () => <div>Test</div>;
+const TestComponent = ({ text = 'Test' }) => <div>{text}</div>;
 
 test('passes custom hooks to component', () => {
   const Container = composeHooks({ useCount, useChange })(TestComponent);
@@ -98,8 +98,8 @@ test('can pass props to hooks via function', () => {
 describe('Edge cases', () => {
   it('returns component if no hooks', () => {
     const Container = composeHooks()(TestComponent);
-    const wrapper = shallow(<Container />);
-    expect(wrapper.html()).toMatchInlineSnapshot(`"<div>Test</div>"`);
+    const wrapper = shallow(<Container text="some text" />);
+    expect(wrapper.html()).toMatchInlineSnapshot(`"<div>some text</div>"`);
   });
 
   it('throws if no component', () => {
@@ -107,24 +107,40 @@ describe('Edge cases', () => {
       `"Component must be provided to compose"`
     );
   });
+});
+
+describe('Naming collisions', () => {
+  const useOne = () => ({ text: 'one' });
+  const useTwo = () => ({ text: 'two' });
+  const useNumber = () => ({ number: 1 });
+  const useBool = () => ({ bool: true });
+  const useNull = () => ({ null: 'not-null' });
 
   it('if prop and hook names collide, props win', () => {
-    const Container = composeHooks({ useChange })(TestComponent);
-    const wrapper = shallow(<Container />);
-    expect(wrapper.find(TestComponent).props().value).toBe('hi');
-    wrapper.setProps({ value: 'newValue' });
-    expect(wrapper.find(TestComponent).props().value).toBe('newValue');
+    jest.spyOn(console, 'warn');
+    const Container = composeHooks({ useOne, useNumber, useBool, useNull })(TestComponent);
+    // Check falsy values, should warn for everything but undefined
+    const wrapper = mount(<Container text="" number={0} bool={false} null={null} />);
+    const [first, second, third, fourth] = console.warn.mock.calls;
+    expect(first[0]).toMatchInlineSnapshot(`"prop 'text' exists, overriding with value: ''"`);
+    expect(second[0]).toMatchInlineSnapshot(`"prop 'number' exists, overriding with value: '0'"`);
+    expect(third[0]).toMatchInlineSnapshot(`"prop 'bool' exists, overriding with value: 'false'"`);
+    expect(fourth[0]).toMatchInlineSnapshot(`"prop 'null' exists, overriding with value: 'null'"`);
+    expect(wrapper.find(TestComponent).props().text).toBe('');
+    expect(wrapper.find(TestComponent).props().number).toBe(0);
+    expect(wrapper.find(TestComponent).props().bool).toBe(false);
+    expect(wrapper.find(TestComponent).props().null).toBe(null);
+    jest.restoreAllMocks();
   });
 
-  it('warns on hook name collisions', () => {
-    console.warn = jest.fn().mockImplementationOnce(() => {});
-    const useChangeTwo = () => ({ value: 'duplicate-hook-prop' });
-    const Container = composeHooks({ useChange, useChangeTwo })(TestComponent);
-    const wrapper = shallow(<Container />);
+  it('if multiple hook value names collide, last one wins', () => {
+    jest.spyOn(console, 'warn');
+    const Container = composeHooks({ useOne, useTwo })(TestComponent);
+    const wrapper = mount(<Container />);
     expect(console.warn.mock.calls[0][0]).toMatchInlineSnapshot(
-      `"prop 'value' exists, overriding with value: duplicate-hook-prop"`
+      `"prop 'text' exists, overriding with value: 'two'"`
     );
-    expect(wrapper.find(TestComponent).props().value).toBe('duplicate-hook-prop');
+    expect(wrapper.find(TestComponent).text()).toBe('two');
     jest.restoreAllMocks();
   });
 });
