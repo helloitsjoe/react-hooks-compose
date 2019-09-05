@@ -8,7 +8,7 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "watch": "webpack --watch",
     "build": "webpack",
-    "prepublishOnly": "npm t -- --silent"
+    "prepublishOnly": "rm -rf dist && npm run build && npm t -- --silent"
   },
   "repository": {
     "type": "git",
@@ -63,6 +63,6 @@
     "react-dom": "^16.8.6",
     "webpack": "^4.38.0",
     "webpack-cli": "^3.3.6",
-    "webpack-simple": "^1.4.0"
+    "webpack-simple": "^1.5.2"
   }
 }
