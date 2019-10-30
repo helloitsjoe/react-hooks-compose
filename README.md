@@ -17,7 +17,7 @@ components that use them.
 
 React Hooks bring with them many benefits. They encapsulate state logic and make
 it more reusable. But what if you have pure presentational components that you
-want to use with different functionality? What if you want to test your
+want to use with different state management? What if you want to test your
 presentaional component in isolation?
 
 React Hooks invert the Container/Presenter pattern, putting the container
@@ -28,11 +28,11 @@ themselves.
 One option:
 
 ```jsx
-import { useMyStuff } from './hooks';
 import { Presenter } from './presenter';
+import { useCustomHook } from './hooks';
 
 const Wrapper = () => {
-  const { foo, bar } = useMyStuff();
+  const { foo, bar } = useCustomHook();
   return <Presenter foo={foo} bar={bar} />;
 };
 
@@ -45,7 +45,8 @@ to the Presenter... there must be a better way!
 ## Basic Usage
 
 `composeHooks` passes values from hooks as props, and allows you to pass any
-other props as normal:
+other props as normal. This allows you to export the hook, stateful component,
+and purely presentational component separately.
 
 ```jsx
 import composeHooks from 'react-hooks-compose';
@@ -56,6 +57,7 @@ const useForm = () => {
   return { name, onChange };
 };
 
+// Other props (in this case `icon`) can be passed in separately
 export const FormPresenter = ({ name, onChange, icon }) => (
   <div className="App">
     <div>{icon}</div>
@@ -67,8 +69,24 @@ export const FormPresenter = ({ name, onChange, icon }) => (
 export default composeHooks({ useForm })(FormPresenter);
 ```
 
-This allows you to export both a component with contained logic, and a purely
-presentational component.
+### Compose multiple hooks:
+
+```js
+const Presenter = ({ name, onChange, foo, bar }) => (
+  <div className="App">
+    <h1>Hello, {name}!</h1>
+    <div>
+      Foo is {foo}, bar is {bar}
+    </div>
+    <input value={name} onChange={onChange} />
+  </div>
+);
+
+export default composeHooks({
+  useForm,
+  useFooBar
+})(FormPresenter);
+```
 
 ### Usage with `useState`
 
@@ -84,16 +102,7 @@ const FormPresenter = ({ nameState: [name, setName] }) => (
 );
 
 export default composeHooks({
-  nameState: () => useState('Calvin'),
-})(FormPresenter);
-```
-
-### Compose multiple hooks:
-
-```js
-export default composeHooks({
-  useForm,
-  nameState: () => useState('Hobbes'),
+  nameState: () => useState('Calvin')
 })(FormPresenter);
 ```
 
