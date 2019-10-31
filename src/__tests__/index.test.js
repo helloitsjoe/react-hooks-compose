@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/button-has-type */
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { shallow, mount } from 'enzyme';
 import composeHooks from '../index';
 
@@ -49,6 +49,18 @@ test('hooks work as expected', () => {
   expect(wrapper.find('input').props().value).toBe(INITIAL_VALUE);
   wrapper.find('input').simulate('change', { target: { value: 'new' } });
   expect(wrapper.find('input').props().value).toBe('new');
+});
+
+test('works with useContext', () => {
+  const TestContext = React.createContext();
+  const Component = ({ value }) => <div>{value}</div>;
+  const Container = composeHooks({ value: () => useContext(TestContext) })(Component);
+  const wrapper = mount(
+    <TestContext.Provider value="Hello">
+      <Container />
+    </TestContext.Provider>
+  );
+  expect(wrapper.text()).toBe('Hello');
 });
 
 test('works with custom hook that returns array', () => {

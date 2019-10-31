@@ -12,18 +12,15 @@ npm i react-hooks-compose
 
 ## Why `react-hooks-compose`?
 
-`react-hooks-compose` gives us an ergonomic way to decouple hooks from the
-components that use them.
+`react-hooks-compose` gives us an ergonomic way to decouple hooks from the components that use them.
 
-React Hooks bring with them many benefits. They encapsulate state logic and make
-it more reusable. But what if you have pure presentational components that you
-want to use with different state management? What if you want to test your
-presentaional component in isolation?
+React Hooks bring with them many benefits. They encapsulate state logic and make it more reusable.
+But what if you have pure presentational components that you want to use with different state
+management? What if you want to test your presentaional component in isolation?
 
-React Hooks invert the Container/Presenter pattern, putting the container
-_inside_ the presenter. This makes it hard to use the same presentational
-component with different hooks, and clunky to test presentational components by
-themselves.
+React Hooks invert the Container/Presenter pattern, putting the container _inside_ the presenter.
+This makes it hard to use the same presentational component with different hooks, and clunky to test
+presentational components by themselves.
 
 One option:
 
@@ -39,14 +36,14 @@ const Wrapper = () => {
 export default Wrapper;
 ```
 
-This works fine, but you end up with an extra component just to connect the hook
-to the Presenter... there must be a better way!
+This works fine, but you end up with an extra component just to connect the hook to the Presenter...
+there must be a better way!
 
 ## Basic Usage
 
-`composeHooks` passes values from hooks as props, and allows you to pass any
-other props as normal. This allows you to export the hook, stateful component,
-and purely presentational component separately.
+`composeHooks` passes values from hooks as props, and allows you to pass any other props as normal.
+This allows you to export the hook, stateful component, and purely presentational component
+separately.
 
 ```jsx
 import composeHooks from 'react-hooks-compose';
@@ -72,26 +69,28 @@ export default composeHooks({ useForm })(FormPresenter);
 ### Compose multiple hooks:
 
 ```js
-const Presenter = ({ name, onChange, foo, bar }) => (
+const Presenter = ({ name, onChange, foo, bar, value }) => (
   <div className="App">
     <h1>Hello, {name}!</h1>
-    <div>
-      Foo is {foo}, bar is {bar}
-    </div>
+    <p>Context value is {value}</p>
+    <p>
+      foo is {foo}, bar is {bar}
+    </p>
     <input value={name} onChange={onChange} />
   </div>
 );
 
 export default composeHooks({
   useForm,
-  useFooBar
+  useFooBar,
+  value: () => useContext(MyContext), // Usage with `useContext`
 })(FormPresenter);
 ```
 
 ### Usage with `useState`
 
-If you compose with `useState` directly (i.e. the prop is an array), the prop
-will remain an array and should be destructured before use:
+If you compose with `useState` directly (i.e. the prop is an array), the prop will remain an array
+and should be destructured before use:
 
 ```jsx
 const FormPresenter = ({ nameState: [name, setName] }) => (
@@ -102,15 +101,14 @@ const FormPresenter = ({ nameState: [name, setName] }) => (
 );
 
 export default composeHooks({
-  nameState: () => useState('Calvin')
+  nameState: () => useState('Calvin'),
 })(FormPresenter);
 ```
 
 ### Pass in props for initial values
 
-If your hooks need access to props to set their initial values, you can pass a
-function to `composeHooks`. This function receives `props` as an argument, and
-should always return an object:
+If your hooks need access to props to set their initial values, you can pass a function to
+`composeHooks`. This function receives `props` as an argument, and should always return an object:
 
 ```jsx
 const useForm = (initialValue = '') => {
