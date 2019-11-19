@@ -16,12 +16,11 @@ npm i react-hooks-compose
 
 React Hooks are great. They encapsulate state logic and make it more reusable. But what if you have
 pure presentational components that you want to use with different state? What if you want to test
-your presentaional component in isolation? What happened to the single responsibility principle?
+your presentaional component in isolation?
 
-React Hooks invert the Container/Presenter pattern, putting the container _inside_ the presenter.
-This makes it hard to use the same presentational component with different hooks, and clunky to test
-presentational components by themselves. It gives stateful components more than
-[one reason to change](https://www.wikiwand.com/en/Single_responsibility_principle).
+React Hooks invert the Container/Presenter pattern, putting the container inside the presenter. This
+makes it hard to use the same presentational component with different hooks, and clunky to test
+presentational components by themselves.
 
 One option:
 
