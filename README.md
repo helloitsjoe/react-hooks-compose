@@ -12,15 +12,16 @@ npm i react-hooks-compose
 
 ## Why `react-hooks-compose`?
 
-`react-hooks-compose` gives us an ergonomic way to decouple hooks from the components that use them.
+`react-hooks-compose` provides an ergonomic way to decouple hooks from the components that use them.
 
-React Hooks bring with them many benefits. They encapsulate state logic and make it more reusable.
-But what if you have pure presentational components that you want to use with different state
-management? What if you want to test your presentaional component in isolation?
+React Hooks are great. They encapsulate state logic and make it more reusable. But what if you have
+pure presentational components that you want to use with different state? What if you want to test
+your presentaional component in isolation? What happened to the single responsibility principle?
 
 React Hooks invert the Container/Presenter pattern, putting the container _inside_ the presenter.
 This makes it hard to use the same presentational component with different hooks, and clunky to test
-presentational components by themselves.
+presentational components by themselves. It gives stateful components more than
+[one reason to change](https://www.wikiwand.com/en/Single_responsibility_principle).
 
 One option:
 
@@ -36,8 +37,9 @@ const Wrapper = () => {
 export default Wrapper;
 ```
 
-This works fine, but you end up with an extra component just to connect the hook to the Presenter...
-there must be a better way!
+This works fine, but you end up with an extra component just to connect the hook to the Presenter.
+If you want to test the presenter in isolation, you have to export it separately. there must be a
+better way!
 
 ## Basic Usage
 
@@ -55,7 +57,7 @@ const useForm = () => {
 };
 
 // Other props (in this case `icon`) can be passed in separately
-export const FormPresenter = ({ name, onChange, icon }) => (
+const FormPresenter = ({ name, onChange, icon }) => (
   <div className="App">
     <div>{icon}</div>
     <h1>Hello, {name}!</h1>
@@ -65,6 +67,11 @@ export const FormPresenter = ({ name, onChange, icon }) => (
 
 export default composeHooks({ useForm })(FormPresenter);
 ```
+
+You can think of `composeHooks` like `react-redux`'s `connect` HOC. For one thing, it creates an
+implicit container. You can think of the object passed into `composeHooks` as `mapHooksToProps`,
+similar to
+[the object form of `mapDispatchToProps`](https://daveceddia.com/redux-mapdispatchtoprops-object-form/).
 
 ### Compose multiple hooks:
 
@@ -122,4 +129,33 @@ const FormContainer = composeHooks(props => ({
 })(FormPresenter);
 
 <FormContainer initialValue="Susie" />
+```
+
+## Testing
+
+`composeHooks` is great for testing. Any props you pass in will override the hooks values, so you
+can test the presenter and container with a single export:
+
+```jsx
+// band-member.js
+const BandMember = ({singer, onClick}) => {...} // <-- Presenter
+
+export default composeHooks({ useName })(BandMember);
+
+// band-member.test.js
+it('returns Joey if singer is true', () => {
+  // Pass in a `singer` boolean as with any presentational component.
+  // Containers don't usually allow this.
+  const {getByLabelText} = render(<BandMember singer />);
+  expect(getByLabelText('Name').textContent).toBe('Joey');
+});
+
+it('updates name to Joey when Get Singer button is clicked', () => {
+  // If you don't pass in props, the component will use the hooks provided
+  // in the module. In this case, `useName` returns `singer` and `onClick`.
+  const {getByLabelText} = render(<BandMember />);
+  expect(getByLabelText('Name').textContent).toBe('Johnny');
+  fireEvent.click(getByText('Get Singer'));
+  expect(getByLabelText('Name').textContent).toBe('Joey');
+})
 ```
