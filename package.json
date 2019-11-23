@@ -45,6 +45,7 @@
     "react": "^16.8.6"
   },
   "devDependencies": {
+    "@testing-library/react": "^9.3.2",
     "babel-eslint": "^10.0.2",
     "babel-loader": "^8.0.6",
     "babel-react-simple": "^1.0.2",

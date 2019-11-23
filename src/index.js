@@ -10,9 +10,6 @@ const composeHooks = hooks => Component => {
   }
 
   return props => {
-    // TODO: Potentially optimize similar to mapStateToProps in react-redux
-    // https://github.com/reduxjs/react-redux/blob/master/src/connect/wrapMapToProps.js
-
     const hooksObject = typeof hooks === 'function' ? hooks(props) : hooks;
 
     // Flatten values from all hooks to a single object

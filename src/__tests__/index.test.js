@@ -1,7 +1,9 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/button-has-type */
 import React, { useState, useContext } from 'react';
+// TODO: Convert to RTL
 import { shallow, mount } from 'enzyme';
+import { render, fireEvent } from '@testing-library/react';
 import composeHooks from '../index';
 
 const INITIAL_COUNT = 0;
@@ -121,15 +123,77 @@ describe('Edge cases', () => {
   });
 });
 
+describe('React.memo', () => {
+  it('does not break memoization', () => {
+    // Note that using shorthand like composeHooks({ useOne: () => useState() }) will
+    // not work, because the array returned from useState will break strict equality.
+    // TODO: Document these cases!
+    const useOne = () => {
+      const [test, setTest] = useState('');
+      return test;
+    };
+
+    let rendersOne = 0;
+    let rendersTwo = 0;
+
+    const ChildOne = ({ one }) => <div>{rendersOne++}</div>;
+    const ChildTwo = ({ two }) => <div>{rendersTwo++}</div>;
+
+    const HookedOne = composeHooks({ useOne })(ChildOne);
+    const HookedMemoTwo = composeHooks({ useOne })(React.memo(ChildTwo));
+
+    const Parent = () => {
+      const [count, setCount] = useState(0);
+      const [one, setOne] = useState(0);
+      const [two, setTwo] = useState(0);
+
+      return (
+        <>
+          <HookedOne one={one} />
+          <HookedMemoTwo two={two} />
+          <button onClick={() => setCount(c => c + 1)}>Rerender Parent</button>
+          <button onClick={() => setOne(c => c + 1)}>Update Child One Props</button>
+          <button onClick={() => setTwo(c => c + 1)}>Update Child Two Props</button>
+        </>
+      );
+    };
+
+    const { getByText } = render(<Parent />);
+    expect(rendersOne).toBe(1);
+    expect(rendersTwo).toBe(1);
+
+    fireEvent.click(getByText('Update Child One Props'));
+    expect(rendersOne).toBe(2);
+    expect(rendersTwo).toBe(1);
+
+    fireEvent.click(getByText('Update Child Two Props'));
+    expect(rendersOne).toBe(3);
+    expect(rendersTwo).toBe(2);
+
+    fireEvent.click(getByText('Rerender Parent'));
+    expect(rendersOne).toBe(4);
+    expect(rendersTwo).toBe(2);
+  });
+});
+
 describe('Naming collisions', () => {
   const useOne = () => ({ text: 'one' });
   const useTwo = () => ({ text: 'two' });
   const useNumber = () => ({ number: 1 });
   const useBool = () => ({ bool: true });
   const useNull = () => ({ null: 'not-null' });
+  const origWarn = console.warn;
+
+  beforeEach(() => {
+    console.warn = jest.fn(() => {});
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    console.warn = origWarn;
+  });
 
   it('if prop and hook names collide, props win', () => {
-    jest.spyOn(console, 'warn');
     const Container = composeHooks({ useOne, useNumber, useBool, useNull })(TestComponent);
     // Check falsy values, should warn for everything but undefined
     const wrapper = mount(<Container text="" number={0} bool={false} null={null} />);
@@ -142,17 +206,14 @@ describe('Naming collisions', () => {
     expect(wrapper.find(TestComponent).props().number).toBe(0);
     expect(wrapper.find(TestComponent).props().bool).toBe(false);
     expect(wrapper.find(TestComponent).props().null).toBe(null);
-    jest.restoreAllMocks();
   });
 
   it('if multiple hook value names collide, last one wins', () => {
-    jest.spyOn(console, 'warn');
     const Container = composeHooks({ useOne, useTwo })(TestComponent);
     const wrapper = mount(<Container />);
     expect(console.warn.mock.calls[0][0]).toMatchInlineSnapshot(
       `"prop 'text' exists, overriding with value: 'two'"`
     );
     expect(wrapper.find(TestComponent).text()).toBe('two');
-    jest.restoreAllMocks();
   });
 });
