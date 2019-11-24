@@ -124,55 +124,128 @@ describe('Edge cases', () => {
 });
 
 describe('React.memo', () => {
-  it('does not break memoization', () => {
-    // Note that using shorthand like composeHooks({ useOne: () => useState() }) will
-    // not work, because the array returned from useState will break strict equality.
-    // TODO: Document these cases!
-    const useOne = () => {
-      const [test, setTest] = useState('');
-      return test;
-    };
+  // Note that using shorthand like composeHooks({ useOne: () => useState() }) will
+  // not work, because the array returned from useState will break strict equality.
+  // TODO: Document these cases!
 
-    let rendersOne = 0;
-    let rendersTwo = 0;
+  // Setup:
+  // const useOne = () => {
+  //   const [test, setTest] = useState('');
+  //   return test;
+  // };
 
-    const ChildOne = ({ one }) => <div>{rendersOne++}</div>;
-    const ChildTwo = ({ two }) => <div>{rendersTwo++}</div>;
+  const TestContext = React.createContext({});
+  const TestProvider = ({ children }) => {
+    const [nameOne, setNameOne] = useState('');
+    const [nameTwo, setNameTwo] = useState('');
 
-    const HookedOne = composeHooks({ useOne })(ChildOne);
-    const HookedMemoTwo = composeHooks({ useOne })(React.memo(ChildTwo));
+    return (
+      <TestContext.Provider value={{ nameOne, nameTwo, setNameOne, setNameTwo }}>
+        {children}
+      </TestContext.Provider>
+    );
+  };
+  const withContext = Component => props => (
+    <TestProvider>
+      <Component {...props} />
+    </TestProvider>
+  );
 
-    const Parent = () => {
-      const [count, setCount] = useState(0);
-      const [one, setOne] = useState(0);
-      const [two, setTwo] = useState(0);
+  const useOne = () => {
+    const { nameOne } = useContext(TestContext);
+    return { nameOne };
+  };
+  const useTwo = () => {
+    const { nameTwo } = useContext(TestContext);
+    return { nameTwo };
+  };
 
-      return (
-        <>
-          <HookedOne one={one} />
-          <HookedMemoTwo two={two} />
-          <button onClick={() => setCount(c => c + 1)}>Rerender Parent</button>
-          <button onClick={() => setOne(c => c + 1)}>Update Child One Props</button>
-          <button onClick={() => setTwo(c => c + 1)}>Update Child Two Props</button>
-        </>
-      );
-    };
+  let rendersOne = 0;
+  let rendersTwo = 0;
+  let rendersParent = 0;
 
+  const ChildOne = ({ one, nameOne }) => {
+    rendersOne++;
+    return <div data-testid="one">{nameOne}</div>;
+  };
+  const ChildTwo = ({ two, nameTwo }) => {
+    rendersTwo++;
+    return <div data-testid="two">{nameTwo}</div>;
+  };
+  const InputChild = () => {
+    const { setNameOne, setNameTwo } = useContext(TestContext);
+    return (
+      <>
+        <input onChange={e => setNameOne(e.target.value)} placeholder="Name One" />
+        <input onChange={e => setNameTwo(e.target.value)} placeholder="Name Two" />
+      </>
+    );
+  };
+
+  const HookedOne = composeHooks({ useOne })(ChildOne);
+  const HookedMemoTwo = composeHooks({ useTwo })(React.memo(ChildTwo));
+
+  const Parent = withContext(() => {
+    rendersParent++;
+    const [count, setCount] = useState(0);
+    const [one, setOne] = useState(0);
+    const [two, setTwo] = useState(0);
+
+    return (
+      <>
+        <HookedOne one={one} />
+        <HookedMemoTwo two={two} />
+        <button onClick={() => setCount(c => c + 1)}>Rerender Parent</button>
+        <button onClick={() => setOne(c => c + 1)}>Update Child One Props</button>
+        <button onClick={() => setTwo(c => c + 1)}>Update Child Two Props</button>
+        <InputChild />
+      </>
+    );
+  });
+
+  beforeEach(() => {
+    rendersOne = 0;
+    rendersTwo = 0;
+    rendersParent = 0;
+  });
+
+  it('renders memoized child when props update', () => {
     const { getByText } = render(<Parent />);
     expect(rendersOne).toBe(1);
     expect(rendersTwo).toBe(1);
 
+    fireEvent.click(getByText('Update Child Two Props'));
+    expect(rendersOne).toBe(2);
+    expect(rendersTwo).toBe(2);
+  });
+
+  it('does NOT re-render memoized child when child 2 props update', () => {
+    const { getByText } = render(<Parent />);
     fireEvent.click(getByText('Update Child One Props'));
     expect(rendersOne).toBe(2);
     expect(rendersTwo).toBe(1);
+  });
 
-    fireEvent.click(getByText('Update Child Two Props'));
-    expect(rendersOne).toBe(3);
-    expect(rendersTwo).toBe(2);
+  it('does NOT render memoized child when non-subscribed context value updates', () => {
+    const { getByPlaceholderText, getByTestId } = render(<Parent />);
+    fireEvent.change(getByPlaceholderText(/name one/i), { target: { value: 'Calvin' } });
+    expect(rendersOne).toBe(2);
+    expect(rendersTwo).toBe(1);
+    // All updates via Context so parent should not rerender
+    expect(rendersParent).toBe(1);
+    expect(getByTestId('one').textContent).toBe('Calvin');
+    expect(getByTestId('two').textContent).toBe('');
+  });
 
-    fireEvent.click(getByText('Rerender Parent'));
-    expect(rendersOne).toBe(4);
+  it('renders memoized child when subscribed context value changes', () => {
+    const { getByPlaceholderText, getByTestId } = render(<Parent />);
+    fireEvent.change(getByPlaceholderText(/name two/i), { target: { value: 'Hobbes' } });
+    expect(rendersOne).toBe(2);
     expect(rendersTwo).toBe(2);
+    // All updates via Context so parent should not rerender
+    expect(rendersParent).toBe(1);
+    expect(getByTestId('one').textContent).toBe('');
+    expect(getByTestId('two').textContent).toBe('Hobbes');
   });
 });
 
