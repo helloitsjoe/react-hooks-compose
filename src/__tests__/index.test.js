@@ -24,7 +24,11 @@ const useChange = (initialValue = INITIAL_VALUE) => {
 
 const useUseState = () => useState(INITIAL_COUNT);
 
-const TestComponent = ({ text = 'Test' }) => <div>{text}</div>;
+const TestComponent = ({ text }) => <div>{text}</div>;
+
+TestComponent.defaultProps = {
+  text: 'Test',
+};
 
 test('passes custom hooks to component', () => {
   const Container = composeHooks({ useCount, useChange })(TestComponent);
@@ -127,12 +131,6 @@ describe('React.memo', () => {
   // Note that using shorthand like composeHooks({ useOne: () => useState() }) will
   // not work, because the array returned from useState will break strict equality.
   // TODO: Document these cases!
-
-  // Setup:
-  // const useOne = () => {
-  //   const [test, setTest] = useState('');
-  //   return test;
-  // };
 
   const TestContext = React.createContext({});
   const TestProvider = ({ children }) => {
@@ -266,7 +264,7 @@ describe('Naming collisions', () => {
     console.warn = origWarn;
   });
 
-  it('if prop and hook names collide, props win', () => {
+  it('if prop and hook names collide, props win (not including defaultProps)', () => {
     const Container = composeHooks({ useOne, useNumber, useBool, useNull })(TestComponent);
     // Check falsy values, should warn for everything but undefined
     const wrapper = mount(<Container text="" number={0} bool={false} null={null} />);
@@ -279,6 +277,14 @@ describe('Naming collisions', () => {
     expect(wrapper.find(TestComponent).props().number).toBe(0);
     expect(wrapper.find(TestComponent).props().bool).toBe(false);
     expect(wrapper.find(TestComponent).props().null).toBe(null);
+  });
+
+  it('hooks override defaultProps', () => {
+    const Container = composeHooks({ useOne })(TestComponent);
+    const { container } = render(<Container />);
+    const { container: test } = render(<TestComponent />);
+    expect(test.textContent).toBe('Test');
+    expect(container.textContent).toBe('one');
   });
 
   it('if multiple hook value names collide, last one wins', () => {
