@@ -42,7 +42,7 @@
   },
   "homepage": "https://github.com/helloitsjoe/react-hooks-compose#readme",
   "peerDependencies": {
-    "react": "^16.8.6"
+    "react": "^16.8"
   },
   "devDependencies": {
     "@testing-library/react": "^9.4.0",
