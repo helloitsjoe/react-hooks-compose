@@ -121,13 +121,13 @@ const useForm = (initialValue = '') => {
   const [value, setValue] = useState(initialValue);
   const onChange = e => setValue(e.target.value);
   return { value, onChange };
-}
+};
 
 const FormContainer = composeHooks(props => ({
-  useForm: () => useForm(props.initialValue)
-})(FormPresenter);
+  useForm: () => useForm(props.initialValue),
+}))(FormPresenter);
 
-<FormContainer initialValue="Susie" />
+<FormContainer initialValue="Susie" />;
 ```
 
 ## Testing
