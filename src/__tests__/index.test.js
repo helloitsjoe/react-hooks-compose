@@ -3,7 +3,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 // TODO: Convert to RTL
 import { shallow, mount } from 'enzyme';
-import { render, fireEvent, wait } from '@testing-library/react';
+import { render, fireEvent, waitFor } from '@testing-library/react';
 import composeHooks from '../index';
 
 const INITIAL_COUNT = 0;
@@ -127,7 +127,7 @@ test('useEffect from custom hook', () => {
   const Container = composeHooks({ customHook })(Component);
   const { container } = render(<Container />);
   expect(container.textContent).toBe('before');
-  return wait(() => {
+  return waitFor(() => {
     expect(container.textContent).toBe('after');
   });
 });
