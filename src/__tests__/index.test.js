@@ -1,9 +1,9 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/button-has-type */
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 // TODO: Convert to RTL
 import { shallow, mount } from 'enzyme';
-import { render, fireEvent } from '@testing-library/react';
+import { render, fireEvent, wait } from '@testing-library/react';
 import composeHooks from '../index';
 
 const INITIAL_COUNT = 0;
@@ -111,6 +111,25 @@ test('can pass props to hooks via function', () => {
   }))(Component);
   const wrapper = mount(<Container initialValue={TEST_VALUE} />);
   expect(wrapper.text()).toBe(TEST_VALUE);
+});
+
+test('useEffect from custom hook', () => {
+  const Component = ({ value }) => value;
+  const customHook = () => {
+    const [value, setValue] = useState('before');
+    useEffect(() => {
+      setTimeout(() => {
+        setValue('after');
+      }, 50);
+    }, []);
+    return { value };
+  };
+  const Container = composeHooks({ customHook })(Component);
+  const { container } = render(<Container />);
+  expect(container.textContent).toBe('before');
+  return wait(() => {
+    expect(container.textContent).toBe('after');
+  });
 });
 
 describe('Edge cases', () => {
