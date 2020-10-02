@@ -111,6 +111,10 @@ export default composeHooks({
 })(FormPresenter);
 ```
 
+### Usage with `useEffect`
+
+`useEffect` is supported, both in a custom hook and in `composeHooks` directly.
+
 ### Pass in props for initial values
 
 If your hooks need access to props to set their initial values, you can pass a function to
