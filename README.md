@@ -113,7 +113,28 @@ export default composeHooks({
 
 ### Usage with `useEffect`
 
-`useEffect` is supported, both in a custom hook and in `composeHooks` directly.
+`useEffect` is supported - the most common usage would be in a custom hook. For example:
+
+```js
+const usePostData = data => {
+  const [postStatus, setPostStatus] = useState(SUCCESS);
+
+  useEffect(() => {
+    setPostStatus(LOADING);
+    postData(data).then(() => {
+      setPostStatus(SUCCESS);
+    }).catch(err => {
+      setPostStatus(ERROR);
+    });
+  }, [data]);
+
+  return { postStatus };
+};
+
+const App = ({ postStatus }) => { ... };
+
+export default compose({ usePostData })(App);
+```
 
 ### Pass in props for initial values
 
