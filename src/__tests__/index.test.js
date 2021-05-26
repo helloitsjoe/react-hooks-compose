@@ -33,7 +33,9 @@ TestComponent.defaultProps = {
 test('passes custom hooks to component', () => {
   const Container = composeHooks({ useCount, useChange })(TestComponent);
   const wrapper = shallow(<Container />);
-  const { count, increment, decrement, value, onChange } = wrapper.find(TestComponent).props();
+  const { count, increment, decrement, value, onChange } = wrapper
+    .find(TestComponent)
+    .props();
   expect(count).toBe(INITIAL_COUNT);
   expect(value).toBe(INITIAL_VALUE);
   expect(typeof increment).toBe('function');
@@ -49,7 +51,9 @@ test('passes props to component', () => {
 });
 
 test('hooks work as expected', () => {
-  const Component = ({ value, onChange }) => <input value={value} onChange={onChange} />;
+  const Component = ({ value, onChange }) => (
+    <input value={value} onChange={onChange} />
+  );
   const Container = composeHooks({ useChange })(Component);
   const wrapper = mount(<Container />);
   expect(wrapper.find('input').props().value).toBe(INITIAL_VALUE);
@@ -60,7 +64,10 @@ test('hooks work as expected', () => {
 test('works with useContext', () => {
   const TestContext = React.createContext();
   const Component = ({ value }) => <div>{value}</div>;
-  const Container = composeHooks({ value: () => useContext(TestContext) })(Component);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const Container = composeHooks({ value: () => useContext(TestContext) })(
+    Component
+  );
   const wrapper = mount(
     <TestContext.Provider value="Hello">
       <Container />
@@ -95,7 +102,9 @@ test('works with custom hook that returns single value', () => {
     const [bar] = useState('Click me');
     return bar;
   };
-  const Component = ({ setFoo, bar }) => <button onClick={() => setFoo('after')}>{bar}</button>;
+  const Component = ({ setFoo, bar }) => (
+    <button onClick={() => setFoo('after')}>{bar}</button>
+  );
   const Container = composeHooks({ setFoo: useFoo, bar: useBar })(Component);
   const wrapper = mount(<Container />);
   expect(outerFoo).toBe('before');
@@ -115,7 +124,7 @@ test('can pass props to hooks via function', () => {
 
 test('useEffect from custom hook', () => {
   const Component = ({ value }) => value;
-  const customHook = () => {
+  const useCustomHook = () => {
     const [value, setValue] = useState('before');
     useEffect(() => {
       setTimeout(() => {
@@ -124,7 +133,7 @@ test('useEffect from custom hook', () => {
     }, []);
     return { value };
   };
-  const Container = composeHooks({ customHook })(Component);
+  const Container = composeHooks({ useCustomHook })(Component);
   const { container } = render(<Container />);
   expect(container.textContent).toBe('before');
   return waitFor(() => {
@@ -157,7 +166,9 @@ describe('React.memo', () => {
     const [nameTwo, setNameTwo] = useState('');
 
     return (
-      <TestContext.Provider value={{ nameOne, nameTwo, setNameOne, setNameTwo }}>
+      <TestContext.Provider
+        value={{ nameOne, nameTwo, setNameOne, setNameTwo }}
+      >
         {children}
       </TestContext.Provider>
     );
@@ -183,18 +194,34 @@ describe('React.memo', () => {
 
   const ChildOne = ({ one, nameOne }) => {
     rendersOne++;
-    return <div data-testid="one">{nameOne}</div>;
+    return (
+      <>
+        {one}
+        <div data-testid="one">{nameOne}</div>
+      </>
+    );
   };
   const ChildTwo = ({ two, nameTwo }) => {
     rendersTwo++;
-    return <div data-testid="two">{nameTwo}</div>;
+    return (
+      <>
+        {two}
+        <div data-testid="two">{nameTwo}</div>
+      </>
+    );
   };
   const InputChild = () => {
     const { setNameOne, setNameTwo } = useContext(TestContext);
     return (
       <>
-        <input onChange={e => setNameOne(e.target.value)} placeholder="Name One" />
-        <input onChange={e => setNameTwo(e.target.value)} placeholder="Name Two" />
+        <input
+          onChange={e => setNameOne(e.target.value)}
+          placeholder="Name One"
+        />
+        <input
+          onChange={e => setNameTwo(e.target.value)}
+          placeholder="Name Two"
+        />
       </>
     );
   };
@@ -204,7 +231,7 @@ describe('React.memo', () => {
 
   const Parent = withContext(() => {
     rendersParent++;
-    const [count, setCount] = useState(0);
+    const [, setCount] = useState(0);
     const [one, setOne] = useState(0);
     const [two, setTwo] = useState(0);
 
@@ -213,8 +240,12 @@ describe('React.memo', () => {
         <HookedOne one={one} />
         <HookedMemoTwo two={two} />
         <button onClick={() => setCount(c => c + 1)}>Rerender Parent</button>
-        <button onClick={() => setOne(c => c + 1)}>Update Child One Props</button>
-        <button onClick={() => setTwo(c => c + 1)}>Update Child Two Props</button>
+        <button onClick={() => setOne(c => c + 1)}>
+          Update Child One Props
+        </button>
+        <button onClick={() => setTwo(c => c + 1)}>
+          Update Child Two Props
+        </button>
         <InputChild />
       </>
     );
@@ -245,7 +276,9 @@ describe('React.memo', () => {
 
   it('does NOT render memoized child when non-subscribed context value updates', () => {
     const { getByPlaceholderText, getByTestId } = render(<Parent />);
-    fireEvent.change(getByPlaceholderText(/name one/i), { target: { value: 'Calvin' } });
+    fireEvent.change(getByPlaceholderText(/name one/i), {
+      target: { value: 'Calvin' },
+    });
     expect(rendersOne).toBe(2);
     expect(rendersTwo).toBe(1);
     // All updates via Context so parent should not rerender
@@ -256,7 +289,9 @@ describe('React.memo', () => {
 
   it('renders memoized child when subscribed context value changes', () => {
     const { getByPlaceholderText, getByTestId } = render(<Parent />);
-    fireEvent.change(getByPlaceholderText(/name two/i), { target: { value: 'Hobbes' } });
+    fireEvent.change(getByPlaceholderText(/name two/i), {
+      target: { value: 'Hobbes' },
+    });
     expect(rendersOne).toBe(2);
     expect(rendersTwo).toBe(2);
     // All updates via Context so parent should not rerender
@@ -284,14 +319,26 @@ describe('Naming collisions', () => {
   });
 
   it('if prop and hook names collide, props win (not including defaultProps)', () => {
-    const Container = composeHooks({ useOne, useNumber, useBool, useNull })(TestComponent);
+    const Container = composeHooks({ useOne, useNumber, useBool, useNull })(
+      TestComponent
+    );
     // Check falsy values, should warn for everything but undefined
-    const wrapper = mount(<Container text="" number={0} bool={false} null={null} />);
+    const wrapper = mount(
+      <Container text="" number={0} bool={false} null={null} />
+    );
     const [first, second, third, fourth] = console.warn.mock.calls;
-    expect(first[0]).toMatchInlineSnapshot(`"prop 'text' exists, overriding with value: ''"`);
-    expect(second[0]).toMatchInlineSnapshot(`"prop 'number' exists, overriding with value: '0'"`);
-    expect(third[0]).toMatchInlineSnapshot(`"prop 'bool' exists, overriding with value: 'false'"`);
-    expect(fourth[0]).toMatchInlineSnapshot(`"prop 'null' exists, overriding with value: 'null'"`);
+    expect(first[0]).toMatchInlineSnapshot(
+      `"prop 'text' exists, overriding with value: ''"`
+    );
+    expect(second[0]).toMatchInlineSnapshot(
+      `"prop 'number' exists, overriding with value: '0'"`
+    );
+    expect(third[0]).toMatchInlineSnapshot(
+      `"prop 'bool' exists, overriding with value: 'false'"`
+    );
+    expect(fourth[0]).toMatchInlineSnapshot(
+      `"prop 'null' exists, overriding with value: 'null'"`
+    );
     expect(wrapper.find(TestComponent).props().text).toBe('');
     expect(wrapper.find(TestComponent).props().number).toBe(0);
     expect(wrapper.find(TestComponent).props().bool).toBe(false);
