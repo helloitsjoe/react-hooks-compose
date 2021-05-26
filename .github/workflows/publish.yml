@@ -12,6 +12,8 @@ jobs:
         with:
           node-version: '14.x'
           registry-url: 'https://registry.npmjs.org'
+      - uses: c-hive/gha-yarn-cache@v1
+      - run: yarn
       - run: npx helloitsjoe/release-toolkit#v1.0.0 publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

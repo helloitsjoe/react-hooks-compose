@@ -9,7 +9,7 @@
     "coveralls": "cat ./coverage/lcov.info | coveralls",
     "watch": "webpack --watch",
     "build": "webpack",
-    "prepublishOnly": "rm -rf dist && npm run build && npm t -- --silent"
+    "prepublishOnly": "rm -rf dist && yarn build && yarn test --silent"
   },
   "repository": {
     "type": "git",
