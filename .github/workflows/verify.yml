@@ -1,0 +1,24 @@
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - uses: c-hive/gha-yarn-cache@v1
+      - run: yarn
+      - run: npx helloitsjoe/release-toolkit#v1.0.0 verify
+      - run: yarn test
+      - run: yarn lint
+      - run: yarn coveralls
+        env:
+          COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
