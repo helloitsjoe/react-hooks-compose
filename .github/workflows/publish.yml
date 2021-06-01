@@ -14,7 +14,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - uses: c-hive/gha-yarn-cache@v1
       - run: yarn
-      - run: npx helloitsjoe/release-toolkit#v1.0.0 publish
+      - run: npx helloitsjoe/release-toolkit publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
