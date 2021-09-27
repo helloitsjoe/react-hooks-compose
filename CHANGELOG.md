@@ -1,3 +1,9 @@
+## [2.0.16](https://github.com/helloitsjoe/react-hooks-compose/releases/tag/v2.0.16) (2021-09-26)
+
+**Chore**
+
+- Bump dependencies
+
 ## [2.0.15](https://github.com/helloitsjoe/react-hooks-compose/releases/tag/v2.0.15) (2021-05-30)
 
 **Chore**
