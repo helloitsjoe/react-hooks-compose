@@ -1,3 +1,9 @@
+## [2.0.17](https://github.com/helloitsjoe/react-hooks-compose/releases/tag/v2.0.17) (2022-03-27)
+
+**Chore**
+
+Bump minimist to 1.2.6
+
 ## [2.0.16](https://github.com/helloitsjoe/react-hooks-compose/releases/tag/v2.0.16) (2021-09-26)
 
 **Chore**
