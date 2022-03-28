@@ -1,3 +1,9 @@
+## [2.0.18](https://github.com/helloitsjoe/react-hooks-compose/releases/tag/v2.0.18) (2022-03-28)
+
+**Chore**
+
+Bump ansi-regex to 4.1.1
+
 ## [2.0.17](https://github.com/helloitsjoe/react-hooks-compose/releases/tag/v2.0.17) (2022-03-27)
 
 **Chore**
