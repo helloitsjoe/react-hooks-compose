@@ -8,13 +8,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [14.x, 16.x]
+        # Node 16.17 includes npm 8.15 which has a bug in npx
+        node-version: [16.16.x, 18.x]
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - uses: c-hive/gha-yarn-cache@v1
+          cache: yarn
       - run: yarn
       - run: npx helloitsjoe/release-toolkit verify
       - run: yarn test

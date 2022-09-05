@@ -1,3 +1,11 @@
+## [2.0.19](https://github.com/helloitsjoe/react-hooks-compose/releases/tag/v2.0.19) (2022-09-05)
+
+**Chore**
+
+- Include React 17 and 18 in `peerDependencies`
+- Remove `enzyme` and convert tests to React Testing Library
+- Upgrade dependencies
+
 ## [2.0.18](https://github.com/helloitsjoe/react-hooks-compose/releases/tag/v2.0.18) (2022-03-28)
 
 **Chore**
