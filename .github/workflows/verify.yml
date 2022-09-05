@@ -11,10 +11,10 @@ jobs:
         node-version: [14.x, 16.x]
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - uses: c-hive/gha-yarn-cache@v1
+          cache: yarn
       - run: yarn
       - run: npx helloitsjoe/release-toolkit verify
       - run: yarn test
