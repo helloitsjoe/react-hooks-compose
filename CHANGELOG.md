@@ -1,3 +1,10 @@
+## [2.0.20](https://github.com/helloitsjoe/react-hooks-compose/releases/tag/v2.0.20) (2022-12-07)
+
+**Chore**
+
+- Bump decode-uri-component from 0.2.0 to 0.2.2
+- Bump loader-utils from 1.4.0 to 1.4.2
+
 ## [2.0.19](https://github.com/helloitsjoe/react-hooks-compose/releases/tag/v2.0.19) (2022-09-05)
 
 **Chore**
